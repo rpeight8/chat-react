@@ -1,45 +1,21 @@
 import { useEffect, useState } from "react";
 
 import "./App.css";
-import socket from "./socket";
+import { useSocket } from "./socket";
+import Chat from "./components/Chat";
 
 function App() {
-  const [isConnected, setIsConnected] = useState(socket.connected);
-  const [helloEvents, setHelloEvents] = useState<string[]>([]);
-  useEffect(() => {
-    function onConnect() {
-      setIsConnected(true);
-    }
+  const { isConnecting, isError } = useSocket();
 
-    function onDisconnect() {
-      setIsConnected(false);
-    }
+  if (isConnecting) {
+    return <div>Connecting...</div>;
+  }
 
-    function onHelloEvent(value: string) {
-      setHelloEvents((previous) => [...previous, value]);
-    }
+  if (isError) {
+    return <div>Error</div>;
+  }
 
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
-    socket.on("hello", onHelloEvent);
-
-    return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
-      socket.off("foo", onHelloEvent);
-    };
-  }, [isConnected]);
-  console.log(helloEvents);
-  return (
-    <div>
-      <h1>Messages</h1>
-      <ul>
-        {helloEvents.map((event, index) => (
-          <li key={index}>{event}</li>
-        ))}
-      </ul>
-    </div>
-  );
+  return <Chat />;
 }
 
 export default App;
