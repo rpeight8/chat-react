@@ -1,17 +1,30 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Rooms } from "@/types";
+import { Button } from "./ui/button";
 
 type RoomsMenuProps = {
   rooms: Rooms;
+  selectedRoom: string | null;
+  onRoomSelect(roomId: string): void;
 };
 
-const RoomsMenu = ({ rooms }: RoomsMenuProps) => {
+const RoomsMenu = ({ rooms, onRoomSelect }: RoomsMenuProps) => {
   return (
-    <div>
+    <div className="border">
+      <h2>Rooms</h2>
       <ScrollArea>
-        <ul className="flex">
+        <ul className="grid">
           {rooms.map((room) => (
-            <li key={room.id}>{room.name}</li>
+            <li key={room.id}>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  onRoomSelect(room.id);
+                }}
+              >
+                {room.name}
+              </Button>
+            </li>
           ))}
         </ul>
       </ScrollArea>

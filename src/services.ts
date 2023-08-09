@@ -1,9 +1,29 @@
 import { Rooms } from "./types";
+import ky from "ky";
+
+const API_URL = "http://localhost:3000/api";
+const kyInstance = ky.create({ prefixUrl: API_URL });
 
 export const loadRooms = async () => {
-  const response = await fetch("http://localhost:3000/api/rooms");
-  // TODO: add schema validation
-  const data = (await response.json()) as Rooms;
-  console.log(data);
-  return data;
+  try {
+    const rooms = await kyInstance.get("rooms").json<Rooms>();
+  
+    return rooms;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(error.message);
+      throw new Error("Failed to load rooms");
+    }
+  }
 };
+
+export const sendMessage = async (roomId: string, message: string) => {
+  try {
+    await kyInstance.post(`rooms/${roomId}/messages`, { json: { message } });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(error.message);
+      throw new Error("Failed to send message");
+    }
+  }
+}
