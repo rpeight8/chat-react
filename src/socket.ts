@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import type { Socket } from "socket.io-client";
-import { Rooms } from "./types";
+import { Messages, Rooms } from "./types";
 
 let socket: Socket | null = null;
 
@@ -58,18 +58,24 @@ export const useOnRoomsUpdated = (onRoomsUpdated: (rooms: Rooms[]) => void) => {
   });
 };
 
-export const useMessages = () => {
-  const [messages, setMessages] = useState([]);
+export const useMessages = (
+  roomId: string | null,
+  onMessages: (messages: Messages) => void
+) => {
+  useEffect(() => {
+    if (!socket || !roomId) {
+      console.error("Socket is not connected");
+      return;
+    }
 
-  if (!socket) {
-    throw new Error("Socket is not connected");
-  }
+    socket.on(`rooms/${roomId}:messages`, (messages) => {
+      onMessages(messages);
+    });
 
-  socket.on("messages", (messages) => {
-    setMessages(messages);
-  });
-
-  return messages;
+    return () => {
+      socket?.off(`rooms/${roomId}:messages`);
+    };
+  }, [onMessages, roomId]);
 };
 
 export const useUsers = () => {
@@ -80,34 +86,6 @@ export const useUsers = () => {
   }
 
   socket.on("users", (users) => {
-    setUsers(users);
-  });
-
-  return users;
-};
-
-export const useRoomMessages = (roomId: string) => {
-  const [messages, setMessages] = useState([]);
-
-  if (!socket) {
-    throw new Error("Socket is not connected");
-  }
-
-  socket.on(`room/${roomId}:messages`, (messages) => {
-    setMessages(messages);
-  });
-
-  return messages;
-};
-
-export const useRoomUsers = (roomId: string) => {
-  const [users, setUsers] = useState([]);
-
-  if (!socket) {
-    throw new Error("Socket is not connected");
-  }
-
-  socket.on(`room/${roomId}:users`, (users) => {
     setUsers(users);
   });
 

@@ -5,10 +5,16 @@ import { Button } from "./ui/button";
 type RoomsMenuProps = {
   rooms: Rooms;
   selectedRoom: string | null;
+  connectedRoom: string | null;
   onRoomSelect(roomId: string): void;
 };
 
-const RoomsMenu = ({ rooms, onRoomSelect }: RoomsMenuProps) => {
+const RoomsMenu = ({
+  rooms,
+  selectedRoom,
+  connectedRoom,
+  onRoomSelect,
+}: RoomsMenuProps) => {
   return (
     <div className="border">
       <h2>Rooms</h2>
@@ -17,7 +23,7 @@ const RoomsMenu = ({ rooms, onRoomSelect }: RoomsMenuProps) => {
           {rooms.map((room) => (
             <li key={room.id}>
               <Button
-                variant="ghost"
+                variant={selectedRoom === room.id ? "secondary" : "ghost"}
                 onClick={() => {
                   onRoomSelect(room.id);
                 }}

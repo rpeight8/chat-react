@@ -19,10 +19,10 @@ const formSchema = z.object({
 });
 
 type MessageInputFormProps = {
-  selectedRoom: string | null;
+  connectedRoom: string | null;
 };
 
-const MessageInputForm = ({ selectedRoom }: MessageInputFormProps) => {
+const MessageInputForm = ({ connectedRoom }: MessageInputFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -32,12 +32,12 @@ const MessageInputForm = ({ selectedRoom }: MessageInputFormProps) => {
 
   const onSubmit = useCallback(
     (data: z.infer<typeof formSchema>) => {
-      if (!selectedRoom) {
+      if (!connectedRoom) {
         return;
       }
-      sendMessage(selectedRoom, data.message);
+      sendMessage(connectedRoom, data.message);
     },
-    [selectedRoom]
+    [connectedRoom]
   );
 
   return (
@@ -53,7 +53,11 @@ const MessageInputForm = ({ selectedRoom }: MessageInputFormProps) => {
             <FormItem>
               <FormLabel>Your message</FormLabel>
               <FormControl>
-                <Input placeholder="Your message here..." {...field} />
+                <Input
+                  placeholder="Your message here..."
+                  disabled={!connectedRoom}
+                  {...field}
+                />
               </FormControl>
               <FormDescription>
                 Message to be sent to other members
@@ -61,7 +65,9 @@ const MessageInputForm = ({ selectedRoom }: MessageInputFormProps) => {
             </FormItem>
           )}
         />
-        <Button type="submit">Send</Button>
+        <Button type="submit" disabled={!connectedRoom}>
+          Send
+        </Button>
       </form>
     </Form>
   );
